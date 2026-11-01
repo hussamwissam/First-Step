@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>First Step – Langzeit-Tracker</title>
+<link rel="icon" type="image/svg+xml" href="first-step-logo.svg">
+<style>
+:root{--h1:#2f7d5b;--h2:#1c6a78;--bg:#f6f5f1;--card:#fff;--ink:#1d2320;--mut:#6b736e;--line:#e2e0d8;--ac:#2f7d5b;--acs:#dcefe4;--warn:#c4572f;--c0:#ece9e0;--c1:#d3e8dc;--c2:#a6d2b9;--c3:#68b08b;--c4:#2f7d5b;color-scheme:light dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141816;--card:#1d2420;--ink:#e8ece9;--mut:#93a09a;--line:#2c352f;--ac:#5fc08f;--acs:#23382d;--warn:#e98a62;--c0:#262e29;--c1:#2b4437;--c2:#32684c;--c3:#3f9468;--c4:#5fc08f}}
+:root[data-theme="dark"]{--bg:#141816;--card:#1d2420;--ink:#e8ece9;--mut:#93a09a;--line:#2c352f;--ac:#5fc08f;--acs:#23382d;--warn:#e98a62;--c0:#262e29;--c1:#2b4437;--c2:#32684c;--c3:#3f9468;--c4:#5fc08f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:640px;margin:0 auto;padding:16px}
+.brand{display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,var(--h1),var(--h2));color:#fff;border-radius:18px;padding:16px;margin-bottom:14px}.brand>div{flex:1;min-width:0}.brand h1{font-size:28px;letter-spacing:.5px;margin:0;line-height:1.1}.brand .tag{font-size:13px;opacity:.9;margin-bottom:6px}.brand .sub{color:rgba(255,255,255,.9);margin:0;font-size:13px}.brand .bar{background:rgba(255,255,255,.28)}.brand .bar i{background:#fff}
+.sub{color:var(--mut);font-size:14px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.nav{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.nav b{font-size:17px}
+button{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer}
+button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+button.bad{background:var(--warn);color:#fff;border-color:var(--warn)}
+button.sm{padding:6px 10px;font-size:14px}
+.row{padding:12px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.rh{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.rh span{color:var(--mut);font-size:13px}
+.ctl{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+input[type=number],input[type=time]{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;width:120px}
+.bar{height:8px;background:var(--c0);border-radius:6px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--c3)}
+.bar i.ok{background:var(--c4)}
+.ok-t{color:var(--ac);font-weight:600}
+.months{display:flex;flex-wrap:wrap;gap:18px}.mon{width:100%;max-width:250px}.mon h3{font-size:14px;margin:0 0 6px}.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cell.m60{border:2px dashed var(--ink)}.mrow{display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line);font-size:15px}label{display:flex;align-items:center;gap:6px;color:var(--mut);font-size:14px}
+.cell{aspect-ratio:1;border-radius:6px;border:1px solid transparent;padding:0;font-size:11px;color:var(--ink);position:relative}
+.cell.c0{background:var(--c0)}.cell.c1{background:var(--c1)}.cell.c2{background:var(--c2)}.cell.c3{background:var(--c3)}.cell.c4{background:var(--c4);color:#fff}
+.cell.fut{opacity:.45}
+.cell.sel{outline:2px solid var(--ink);outline-offset:1px}
+.cell.g::after{content:"";position:absolute;right:3px;top:3px;width:6px;height:6px;border-radius:50%;background:var(--ink)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--bg);border-radius:10px;padding:10px}
+.stat b{display:block;font-size:18px}
+.stat span{color:var(--mut);font-size:13px}
+.leg{display:flex;gap:6px;align-items:center;color:var(--mut);font-size:12px;margin-top:8px;flex-wrap:wrap}
+.leg i{width:12px;height:12px;border-radius:3px;display:inline-block}
+#st{color:var(--mut);font-size:12px;margin-top:6px}
+h2{font-size:16px;margin:0 0 10px}
+
+.hero{display:flex;gap:16px;align-items:center;margin-bottom:14px}.hero b{font-size:17px;line-height:1.3}
+.hab{display:flex;gap:12px;background:var(--bg);border:1px solid var(--line);border-left:4px solid var(--hc);border-radius:14px;padding:12px;margin-bottom:10px}
+.hab.done{background:color-mix(in srgb,var(--hc) 10%,var(--card))}
+.ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:22px;background:color-mix(in srgb,var(--hc) 20%,transparent);flex:none}
+.hb{flex:1;min-width:0}.big{font-size:26px;font-weight:700;letter-spacing:-.5px;margin-top:2px}.big small{font-size:14px;color:var(--mut);font-weight:500}
+.hab .bar i{background:var(--hc)}.hab .rh b{font-size:15px}
+.strip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:12px}
+.chip{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;border-radius:12px}
+.chip small{color:var(--mut);font-size:11px}.chip b{font-size:16px}.chip .dot{width:9px;height:9px;border-radius:50%}
+.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}.chip.on small{color:rgba(255,255,255,.85)}.chip.on .dot{box-shadow:0 0 0 1.5px #fff}
+.chip.today b{text-decoration:underline}
+.stat b{font-size:22px;color:var(--ac)}.off{background:var(--mut);color:#fff;border-color:var(--mut)}
+</style>
+</head>
+<body>
+<main>
+<header class="brand"><svg viewBox="0 0 512 512" width="56" height="56" aria-hidden="true"><rect width="512" height="512" rx="120" fill="#fff" fill-opacity=".18"/><rect x="132" y="308" width="64" height="84" rx="18" fill="#ffc94d"/><rect x="224" y="224" width="64" height="168" rx="18" fill="#fff" fill-opacity=".92"/><rect x="316" y="140" width="64" height="252" rx="18" fill="#fff"/></svg><div><h1>First Step</h1><div class="tag">Jeder Weg beginnt mit dem ersten Schritt</div><div class="sub" id="sub"></div><div class="bar" id="pg"></div></div></header>
+<div class="card">
+  <div class="nav"><button onclick="go(-7)" aria-label="Vorherige Woche">‹</button><b id="dl"></b><button onclick="go(7)" aria-label="Nächste Woche">›</button></div>
+  <div class="strip" id="strip"></div>
+  <div style="text-align:center;margin-top:10px"><button class="sm" onclick="sel=today;render()">Heute</button></div>
+</div>
+<div class="card" id="day"></div>
+<div class="card"><h2>Diese Woche (Mo–So)</h2><div class="stats" id="wk"></div></div>
+<div class="card"><h2>Gewicht (1× pro Monat)</h2><div id="mw"></div></div>
+<div class="card"><h2>Übersicht (6 Monate)</h2><div class="months" id="grid"></div>
+  <div class="leg">Tagesziele erreicht:
+    <i style="background:var(--c0)"></i>0 <i style="background:var(--c1)"></i>1 <i style="background:var(--c2)"></i>2 <i style="background:var(--c3)"></i>3 <i style="background:var(--c4)"></i>4 · Punkt = Training · gestrichelt = Tag 60</div>
+</div>
+<div class="card"><h2>Gesamt</h2><div class="stats" id="tot"></div>
+  <div style="margin-top:12px"><button class="sm" id="exp" onclick="exportCsv()" hidden>Als CSV exportieren</button></div>
+  <div id="st"></div>
+</div>
+</main>
+<script>
+const START='2026-11-02',N=180,G={water:2000,steps:8000,smin:7,smax:9};
+const pad=n=>String(n).padStart(2,'0');
+const fmt=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parse=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};
+const addD=(s,n)=>{const d=parse(s);d.setDate(d.getDate()+n);return fmt(d)};
+const diff=(a,b)=>Math.round((parse(a)-parse(b))/864e5);
+const today=fmt(new Date());
+let sel=today<START?START:(diff(today,START)>=N?addD(START,N-1):today);
+let days={},col=null,timers={};
+const $=s=>document.querySelector(s);
+const get=d=>days[d]||{};
+const nf=(x,dg=0)=>x==null?'–':x.toLocaleString('de-DE',{minimumFractionDigits:dg,maximumFractionDigits:dg});
+const met=o=>({water:(o.water||0)>=G.water,steps:(o.steps||0)>=G.steps,sleep:o.sleep>=G.smin&&o.sleep<=G.smax,clean:o.clean===true});
+const score=o=>Object.values(met(o)).filter(Boolean).length;
+const wkStart=s=>{const d=parse(s);d.setDate(d.getDate()-((d.getDay()+6)%7));return fmt(d)};
+const dlabel=s=>parse(s).toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'});
+const bar=(p,ok)=>`<div class="bar"><i class="${ok?'ok':''}" style="width:${Math.max(0,Math.min(100,p))}%"></i></div>`;
+
+function save(d){
+  clearTimeout(timers[d]);
+  timers[d]=setTimeout(async()=>{
+    try{
+      if(col)await col.doc(d).set(days[d]);
+      else localStorage.setItem('t60',JSON.stringify(days));
+    }catch(e){$('#st').textContent='Speichern ist fehlgeschlagen.'}
+  },300);
+}
+function upd(patch){days[sel]={...get(sel),...patch};save(sel);render()}
+function setNum(k,v){const x=parseFloat(String(v).replace(',','.'));upd({[k]:isNaN(x)||x<0?null:x})}
+const mlabel=k=>parse(k+'-01').toLocaleDateString('de-DE',{month:'long',year:'numeric'});
+function setSleep(k,v){
+  const o={...get(sel),[k]:v||null};let h=null;
+  if(o.sleepFrom&&o.sleepTo){const t=s=>{const[a,b]=s.split(':').map(Number);return a*60+b};h=((t(o.sleepTo)-t(o.sleepFrom)+1440)%1440)/60;h=h===0?null:Math.round(h*100)/100}
+  window._force=1;upd({[k]:v||null,sleep:h});window._force=0;
+}
+function setMonthWeight(key,v){
+  const x=parseFloat(String(v).replace(',','.'));
+  days['m-'+key]={weight:isNaN(x)||x<=0?null:x};save('m-'+key);window._force=1;render();window._force=0;
+}
+function addWater(ml){upd({water:Math.max(0,(get(sel).water||0)+ml)})}
+function go(n){sel=addD(sel,n);render()}
+
+function render(){
+  if(document.activeElement&&document.activeElement.tagName==='INPUT'&&!window._force)return;
+  const o=get(sel),m=met(o),dn=diff(sel,START)+1;
+  const until=diff(START,today);
+  $('#sub').textContent=until>0?`Start ${until===1?'morgen':'in '+until+' Tagen'} (${dlabel(START)}) · erste Zwischenbilanz an Tag 60 (${dlabel(addD(START,59))})`:`Start ${dlabel(START)} · Tag ${Math.min(Math.max(diff(today,START)+1,0),N)} von ${N} · erste Zwischenbilanz an Tag 60 (${dlabel(addD(START,59))})`;
+  $('#pg').innerHTML='<i style="width:'+Math.min(100,Math.max(0,(diff(today,START)+1)/N*100))+'%"></i>';
+  $('#dl').textContent=dlabel(sel)+(dn>=1&&dn<=N?` · Tag ${dn}`:'');
+  const w=o.water||0,s=o.steps||0;
+  const ws0=wkStart(sel);
+  $('#strip').innerHTML=[...Array(7)].map((_,i)=>{const d=addD(ws0,i),k=days[d]?score(days[d]):0;return `<button class="chip ${d===sel?'on':''} ${d===today?'today':''}" onclick="sel='${d}';render()"><small>${['Mo','Di','Mi','Do','Fr','Sa','So'][i]}</small><b>${parse(d).getDate()}</b><i class="dot" style="background:var(--c${k})${days[d]?'':';opacity:.45'}"></i></button>`}).join('');
+  const sc=score(o),C=2*Math.PI*34;
+  const msg=['Los geht’s – der erste Schritt zählt.','Guter Start, weiter so!','Halbzeit – da geht noch mehr!','Fast geschafft – noch ein Ziel!','Alle Tagesziele erreicht! 🎉'][sc];
+  const tile=(c,ic,t,sub,ok,body)=>`<div class="hab ${ok?'done':''}" style="--hc:${c}"><div class="ic">${ic}</div><div class="hb"><div class="rh"><b>${t}</b><span>${sub}</span></div>${body}</div></div>`;
+  $('#day').innerHTML=`<div class="hero"><svg viewBox="0 0 80 80" width="84" height="84" aria-hidden="true"><circle cx="40" cy="40" r="34" fill="none" stroke="var(--c0)" stroke-width="9"/><circle cx="40" cy="40" r="34" fill="none" stroke="var(--ac)" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-sc/4)}" transform="rotate(-90 40 40)"/><text x="40" y="47" text-anchor="middle" font-size="22" font-weight="700" fill="var(--ink)">${sc}/4</text></svg><div><b>${msg}</b><div class="sub" style="margin:4px 0 0">Tagesziele: Wasser, Schritte, Schlaf, Verzicht</div></div></div>`
+  +tile('#f08a3c','💪','Gym','Ziel: 3–4× pro Woche',o.gym===true,`<div class="big">${o.gym===true?'Trainiert ✓':o.gym===false?'Nicht trainiert':'Noch offen'}</div><div class="ctl"><button class="${o.gym===true?'on':''}" onclick="upd({gym:${o.gym===true?null:true}})">Trainiert ✓</button><button class="${o.gym===false?'off':''}" onclick="upd({gym:${o.gym===false?null:false}})">Nicht trainiert</button></div>`)
+  +tile('#3b9be0','💧','Wasser','Ziel: 2–3 L',m.water,`<div class="big">${nf(w/1000,2)} <small>L</small></div>${bar(w/G.water*100,m.water)}<div class="ctl"><button class="sm" onclick="addWater(-250)">−250 ml</button><button class="sm" onclick="addWater(250)">+250 ml</button><button class="sm" onclick="addWater(500)">+500 ml</button></div>`)
+  +tile('#3aa76d','👟','Schritte','Ziel: 8.000–10.000',m.steps,`<div class="big">${nf(s)}</div>${bar(s/G.steps*100,m.steps)}<div class="ctl"><input type="number" min="0" step="100" inputmode="numeric" style="width:150px" value="${o.steps??''}" placeholder="Schritte eintragen" onchange="window._force=1;setNum('steps',this.value);window._force=0"></div>`)
+  +tile('#8a6fe0','🌙','Schlaf','Ziel: 7–9 Stunden',m.sleep,`<div class="big">${o.sleep==null?'–':nf(o.sleep,1)+' <small>h</small>'}</div><div class="ctl"><label>von <input type="time" value="${o.sleepFrom||''}" onchange="setSleep('sleepFrom',this.value)"></label><label>bis <input type="time" value="${o.sleepTo||''}" onchange="setSleep('sleepTo',this.value)"></label></div>`)
+  +tile('#e0607e','🚫','Süßigkeiten &amp; Fast Food','Verzicht',m.clean,`<div class="big">${o.clean===true?'Verzichtet ✓':o.clean===false?'Ausrutscher':'Noch offen'}</div><div class="ctl"><button class="${o.clean===true?'on':''}" onclick="upd({clean:true})">Verzichtet ✓</button><button class="${o.clean===false?'bad':''}" onclick="upd({clean:false})">Ausrutscher</button></div>`);
+  // Woche
+  const ws=wkStart(sel),wd=[...Array(7)].map((_,i)=>addD(ws,i));
+  const avg=k=>{const v=wd.map(d=>get(d)[k]).filter(x=>typeof x==='number'&&x>0);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null};
+  const gym=wd.filter(d=>get(d).gym).length,cl=wd.filter(d=>get(d).clean===true).length;
+  const aw=avg('water'),as=avg('steps'),asl=avg('sleep');
+  $('#wk').innerHTML=`
+  <div class="stat"><b>${gym} / 3–4</b><span>Trainings</span></div>
+  <div class="stat"><b>${cl} / 7</b><span>Tage ohne Süßes/Fast Food</span></div>
+  <div class="stat"><b>${aw==null?'–':nf(aw/1000,1)+' L'}</b><span>Ø Wasser</span></div>
+  <div class="stat"><b>${nf(as)}</b><span>Ø Schritte</span></div>
+  <div class="stat"><b>${asl==null?'–':nf(asl,1)+' h'}</b><span>Ø Schlaf</span></div>
+  <div class="stat"><b>${wd.filter(d=>days[d]&&score(get(d))===4).length} / 7</b><span>Tage mit allen 4 Tageszielen</span></div>`;
+  // Raster
+  const mons={};
+  for(let i=0;i<N;i++){const d=addD(START,i);(mons[d.slice(0,7)]=mons[d.slice(0,7)]||[]).push([d,i])}
+  $('#grid').innerHTML=Object.keys(mons).map(k=>{
+    const off=(parse(mons[k][0][0]).getDay()+6)%7;
+    return `<div class="mon"><h3>${mlabel(k)}</h3><div class="grid">`+'<span></span>'.repeat(off)+mons[k].map(([d,i])=>{const sc=days[d]?score(days[d]):0;
+    return `<button class="cell c${sc} ${d>today?'fut':''} ${d===sel?'sel':''} ${get(d).gym?'g':''} ${i===59?'m60':''}" title="${dlabel(d)}" onclick="sel='${d}';render()">${parse(d).getDate()}</button>`}).join('')+'</div></div>'}).join('');
+  // Gesamt
+  const keys=Object.keys(days).filter(d=>d>=START&&d<=addD(START,N-1)).sort();
+  const full=keys.filter(d=>score(get(d))===4).length;
+  let streak=0,d=today;if(!(days[d]&&score(get(d))===4))d=addD(d,-1);
+  while(days[d]&&score(get(d))===4){streak++;d=addD(d,-1)}
+  const wt=Object.keys(days).filter(k=>k.startsWith('m-')&&typeof days[k].weight==='number').sort();
+  const w0=wt.length?days[wt[0]].weight:null,w1=wt.length?days[wt[wt.length-1]].weight:null;
+  const mk=sel.slice(0,7);
+  $('#mw').innerHTML=`<div class="ctl" style="margin-top:0"><span>${mlabel(mk)}:</span><input type="number" min="0" step="0.1" inputmode="decimal" value="${(days['m-'+mk]||{}).weight??''}" placeholder="kg" onchange="setMonthWeight('${mk}',this.value)"></div>`+(wt.length?'<div style="margin-top:10px">'+wt.map((k,i)=>{const w=days[k].weight,pv=i?days[wt[i-1]].weight:null,dd=pv==null?'':` (${w-pv>0?'+':''}${nf(w-pv,1)} kg)`;return `<div class="mrow"><span>${mlabel(k.slice(2))}</span><b>${nf(w,1)} kg${dd}</b></div>`}).join('')+'</div>':'<div class="sub" style="margin:10px 0 0">Noch kein Wert. Empfehlung: immer am selben Tag im Monat wiegen, morgens, nüchtern.</div>');
+  $('#tot').innerHTML=`
+  <div class="stat"><b>${keys.filter(k=>get(k).gym).length}</b><span>Trainings gesamt</span></div>
+  <div class="stat"><b>${full}</b><span>Tage mit allen 4 Tageszielen</span></div>
+  <div class="stat"><b>${streak}</b><span>aktuelle Serie (Tage)</span></div>
+  <div class="stat"><b>${w0==null?'–':nf(w0,1)+' → '+nf(w1,1)+' kg'}</b><span>Gewicht (erster → letzter Wert)</span></div>`;
+}
+
+async function exportCsv(){
+  try{
+    const dl=window.claude&&claude.use?await claude.use('downloads'):null;
+    const rows=['Datum;Gym;Wasser_ml;Schritte;Schlaf_von;Schlaf_bis;Schlaf_h;Verzicht'];
+    Object.keys(days).filter(d=>/^\d/.test(d)).sort().forEach(d=>{const o=days[d];rows.push([d,o.gym?1:0,o.water??'',o.steps??'',o.sleepFrom??'',o.sleepTo??'',o.sleep??'',o.clean===true?'ja':o.clean===false?'nein':''].join(';'))});
+    rows.push('','Monat;Gewicht_kg');Object.keys(days).filter(k=>k.startsWith('m-')).sort().forEach(k=>rows.push(k.slice(2)+';'+(days[k].weight??'')));
+    const csv='\ufeff'+rows.join('\n');
+    if(dl)await dl.save({filename:'first-step.csv',data:csv});
+    else{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='first-step.csv';a.click()}
+  }catch(e){}
+}
+
+function useLocal(){
+  try{days=JSON.parse(localStorage.getItem('t60')||'{}')}catch(e){days={}}
+  $('#st').textContent='Gespeichert nur in diesem Browser. Mach regelmäßig einen CSV-Export als Sicherung.';$('#exp').hidden=false;render();
+}
+(async function init(){
+  render();
+  let done=false;
+  const t=setTimeout(()=>{if(!done){done=true;useLocal()}},10000);
+  try{
+    if(!window.claude||!claude.use)throw 0;
+    const user=await claude.use('user'),db=await claude.use('db'),dl=await claude.use('downloads');
+    if(dl)$('#exp').hidden=false;
+    const id=user&&await user.id();
+    if(!db||!id)throw 0;
+    col=db.collection('data/users/'+id);
+    col.onSnapshot(snap=>{
+      done=true;clearTimeout(t);
+      const n={};snap.docs.forEach(x=>{n[x.id]={...x.data()}});days=n;
+      $('#st').textContent='Gespeichert in deinem Konto, privat nur für dich.';render();
+    },()=>{if(!done){done=true;col=null;useLocal()}});
+  }catch(e){if(!done){done=true;clearTimeout(t);col=null;useLocal()}}
+})();
+</script>
+</body>
+</html>
